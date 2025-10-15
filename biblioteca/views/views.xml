@@ -8,6 +8,14 @@
       <field name="arch" type="xml">
         <list>
           <field name="firstname"/>
+          <field name="author"/>
+          <field name="isbn"/>
+          <field name="editorial"/>
+          <field name="fechapubli"/>
+          <field name="genero"/>
+          <field name="numpaginas"/>
+          <field name="disponi"/>
+          <field name="ubi"/>
           <field name="value"/>
           <field name="value2"/>
         </list>
@@ -20,11 +28,18 @@
       <field name="arch" type="xml">
         <form>
           <group>
-          <field name="firstname"/>
-          <field name="author"/>
-          <field name="value"/>
-          <field name="value2"/>
-          <field name="description"/>
+            <field name="firstname"/>
+            <field name="author"/>
+            <field name="isbn"/>
+            <field name="editorial"/>
+            <field name="fechapubli"/>
+            <field name="genero"/>
+            <field name="numpaginas"/>
+            <field name="disponi"/>
+            <field name="ubi"/>
+            <field name="value"/>
+            <field name="value2"/>
+            <field name="description"/>
           </group>
         </form>
       </field>
@@ -37,6 +52,11 @@
         <list>
           <field name="firstname"/>
           <field name="lastname"/>
+          <field name="nacionalidad"/>
+          <field name="cumpleautor"/>
+          <field name="biografia"/>
+          <field name="display_name"/>
+          <field name="book_ids"/>
         </list>
       </field>
     </record>
@@ -49,10 +69,46 @@
           <group>
           <field name="firstname"/>
           <field name="lastname"/>
+          <field name="nacionalidad"/>
+          <field name="cumpleautor"/>
+          <field name="biografia"/>
+          <field name="display_name"/>
+          <field name="book_ids"/>
         </group>
         </form>
       </field>
     </record>
+
+    <record model="ir.ui.view" id="biblioteca_editorial_list">
+      <field name="name">biblioteca editorial list</field>
+      <field name="model">biblioteca.editorial</field>
+      <field name="arch" type="xml">
+        <list>
+          <field name="firstname"/>
+          <field name="display_name"/>
+          <field name="pais_cuidad"/>
+          <field name="fundacion"/>
+          <field name="libro_ids"/>
+        </list>
+      </field>
+    </record>
+
+    <record model="ir.ui.view" id="biblioteca_editorial_form">
+      <field name="name">biblioteca editorial form</field>
+      <field name="model">biblioteca.editorial</field>
+      <field name="arch" type="xml">
+        <form>
+          <group>
+          <field name="firstname"/>
+          <field name="display_name"/>
+          <field name="pais_cuidad"/>
+          <field name="fundacion"/>
+          <field name="libro_ids"/>
+        </group>
+        </form>
+      </field>
+    </record>
+
 
     <!-- actions opening views on models -->
 
@@ -65,6 +121,12 @@
     <record model="ir.actions.act_window" id="biblioteca_autor_action_window">
       <field name="name">biblioteca autores</field>
       <field name="res_model">biblioteca.autor</field>
+      <field name="view_mode">list,form</field>
+    </record>
+
+    <record model="ir.actions.act_window" id="biblioteca_editorial_action_window">
+      <field name="name">biblioteca editorial</field>
+      <field name="res_model">biblioteca.editorial</field>
       <field name="view_mode">list,form</field>
     </record>
 
@@ -89,14 +151,19 @@
     <menuitem name="Biblioteca" id="biblioteca_menu"/>
 
     <menuitem name="Libro menu" 
-    id="biblioteca.libro"
-    parent="biblioteca.biblioteca_menu"
-    action="biblioteca_libro_action_window"/>
+        id="biblioteca.libro"
+        parent="biblioteca_menu"
+        action="biblioteca_libro_action_window"/>
 
     <menuitem name="Autor menu" 
-    id="biblioteca.autor"
-    parent="biblioteca.biblioteca_menu"
-    action="biblioteca_autor_action_window"/>
+        id="biblioteca.autor"
+        parent="biblioteca_menu"
+        action="biblioteca_autor_action_window"/>
+
+    <menuitem name="Editorial menu" 
+        id="biblioteca.editorial"
+        parent="biblioteca_menu"
+        action="biblioteca_editorial_action_window"/>
 
     <!-- menu categories -->
 <!--
