@@ -27,20 +27,26 @@
       <field name="model">biblioteca.libro</field>
       <field name="arch" type="xml">
         <form>
-          <group>
-            <field name="name"/>
-            <field name="author_id"/>
-            <field name="isbn"/>
-            <field name="editorial_id"/>
-            <field name="fechapubli"/>
-            <field name="genero_id"/>
-            <field name="numpaginas"/>
-            <field name="disponi"/>
-            <field name="ubicacion_id"/>
-            <field name="ejemplares"/>
-            <field name="costo"/>
-            <field name="description"/>
-          </group>
+          <header>
+                <button name="action_importar_libro" type="object" string="Importar desde OpenLibrary" class="btn-primary"/>
+          </header>
+          <sheet>
+
+            <group>
+              <field name="name"/>
+              <field name="author_id"/>
+              <field name="isbn"/>
+              <field name="editorial_id"/>
+              <field name="fechapubli"/>
+              <field name="genero_id"/>
+              <field name="numpaginas"/>
+              <field name="disponi"/>
+              <field name="ubicacion_id"/>
+              <field name="ejemplares"/>
+              <field name="costo"/>
+              <field name="description"/>
+            </group>
+          </sheet>  
         </form>
       </field>
     </record>
@@ -157,7 +163,7 @@
       </field>
     </record>
 
-    <record model="ir.ui.view" id="biblioteca_usuario_list">
+<record model="ir.ui.view" id="biblioteca_usuario_list">
       <field name="name">biblioteca usuario list</field>
       <field name="model">biblioteca.usuario</field>
       <field name="arch" type="xml">
@@ -165,8 +171,10 @@
           <field name="nombre"/>
           <field name="dni"/>
           <field name="cel"/>
-          <field name="correo"/>      
+          <field name="correo" widget="email"/>      
           <field name="direccion"/>
+          <field name="tipousuario"/>      
+          <field name="historialprestamo"/>
           <field name="prestamo_ids"/>            
         </list>
       </field>
@@ -179,11 +187,13 @@
         <form>
           <group>
           <field name="nombre"/>
-          <field name="dni"/>
+          <field name="dni" required="True"/>
           <field name="cel"/>
-          <field name="correo"/>      
+          <field name="correo" widget="email"/>      
           <field name="direccion"/>
-          <field name="prestamo_ids"/>  
+          <field name="tipousuario"/>      
+          <field name="historialprestamo"/>
+          <field name="prestamo_ids"/>    
           </group>
         </form>
       </field>
@@ -199,6 +209,10 @@
           <field name="fechaprestamo"/>
           <field name="fechadevolucion"/>
           <field name="estado"/>
+          <field name="multabool"/>
+          <field name="multas"/>
+          <field name="fechamax"/>
+          <field name="personalprestamo"/>
         </list>
       </field>
     </record>
@@ -208,16 +222,28 @@
       <field name="model">biblioteca.prestamo</field>
       <field name="arch" type="xml">
         <form>
-          <group>
-          <field name="usuario_id"/>
-          <field name="libro_id"/>
-          <field name="fechaprestamo"/>
-          <field name="fechadevolucion"/>
-          <field name="estado"/>
-          </group>
+          <header>
+            <button string="Prestar" type="object" name="generar_prestamo" invisible="estado in ('p','d','m')"/>
+            <field name="estado" widget='statusbar'/>
+          </header>
+                  
+            <group>
+            <label for="name" string="Codigo de prestamo"/>
+            <field name="name" readonly="estado in ('p','d','m')" nolabel="1"/>
+
+            <field name="usuario_id" readonly="estado in ('p','d','m')"/>
+            <field name="libro_id" readonly="estado in ('p','d','m')"/>
+            <field name="fechaprestamo" readonly="estado in ('p','d','m')"/>
+            <field name="fechadevolucion" readonly="estado in ('p','d','m')" required="estado in ('p','m')"/>
+            <field name="estado" readonly="estado in ('p','d','m')"/>
+            <field name="multabool" readonly="estado in ('p','d','m')"/>
+            <field name="multas" readonly="estado in ('p','d','m')" invisible="multabool ==False"/>
+            <field name="fechamax" readonly="estado in ('p','d','m')"/>
+            <field name="personalprestamo" readonly="estado in ('p','d','m')"/>
+            </group>
         </form>
       </field>
-    </record>    
+    </record>   
 
     <record model="ir.ui.view" id="biblioteca_personal_list">
       <field name="name">biblioteca personal list</field>
@@ -377,6 +403,11 @@
         id="biblioteca.ubicacion"
         parent="biblioteca_menu"
         action="biblioteca_ubicacion_action_window"/>
+
+    <menuitem name="Usuario menu" 
+        id="biblioteca.usuario"
+        parent="biblioteca_menu"
+        action="biblioteca_usuario_action_window"/>
 
     <menuitem name="Prestamo menu" 
         id="biblioteca.prestamo"
