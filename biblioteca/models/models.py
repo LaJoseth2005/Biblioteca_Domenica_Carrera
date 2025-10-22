@@ -82,7 +82,7 @@ class BibliotecaLibro(models.Model):
 
         resumen = libro_data.get('notes', '')
 
-        nuevo_libro = self.create({
+        nuevo_libro = self.write({
             'name': titulo,
             'isbn': isbn,
             'author_id': autor.id,
@@ -93,6 +93,7 @@ class BibliotecaLibro(models.Model):
         })
 
         return nuevo_libro
+
 
 class BibliotecaAutor(models.Model):
     _name = 'biblioteca.autor'
@@ -217,7 +218,7 @@ class BibliotecaUsuario(models.Model):
             suma += valor
         digito_calculado = (10 - (suma % 10)) % 10
         if digito_calculado != digito_verificador:
-            return (False, f"Dígito verificador incorrecto. Esperado {digito_calculado}, obtenido {digito_verificador}")
+            return (False, f"Dígito verificador incorrecto.")
         return (True, "Cédula válida")
 
 
@@ -237,10 +238,24 @@ class BibliotecaPrestamo(models.Model):
                                         ('d', 'Devuelto'),],string='Estado', default='b')
     multabool= fields.Boolean(default=False)
     multas=fields.Float()
-    fechamax=fields.Datetime(compute='_compute_fecha_devo', string='Fecha Maxima de devolución')
+    fechamax=fields.Datetime(compute='_compute_fecha_devo', string='Fecha Maxima de devolución', store=True)
     personalprestamo=fields.Many2one('res.users', string='Persona que presto el libro',
                              default= lambda self: self.env.uid)
     
+    def _cron_multas(self):
+        self.env['biblioteca.prestamo'].search([('estado', '=', 'p'), 
+                                                ('fechamax', '<', datetime.now())])
+
+        for prestamo in prestamos:
+            prestamo.write=({'estado':'m',
+                             'multabool':True,
+                             'multas':1.0})
+            
+        prestamos = self.env['bibioteca.prestamo'].search((['estado', '=', 'm']))
+        for prestamo in prestamos:
+                days= (datetime.now() - prestamo.fechamax).days
+                prestamo.write=({'multas': days})
+          
     def write(self, vals):
         seq = self.env.ref('biblioteca.sequence_codigo_prestamo').next_by_code('biblioteca.prestamo')
         vals['name'] = seq
