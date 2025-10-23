@@ -3,7 +3,6 @@ from odoo.exceptions import ValidationError
 from datetime import datetime, timedelta
 import requests
 
-
 class BibliotecaLibro(models.Model):
     _name = 'biblioteca.libro'
     _description = 'Libro de la Biblioteca'
@@ -94,7 +93,6 @@ class BibliotecaLibro(models.Model):
 
         return nuevo_libro
 
-
 class BibliotecaAutor(models.Model):
     _name = 'biblioteca.autor'
     _description = 'Autor de la Biblioteca'
@@ -114,7 +112,6 @@ class BibliotecaAutor(models.Model):
             parts = [record.firstname or '', record.lastname or '']
             record.display_name = ' '.join([p for p in parts if p]).strip()
 
-
 class BibliotecaEditorial(models.Model):
     _name = 'biblioteca.editorial'
     _description = 'Editorial de la Biblioteca'
@@ -131,7 +128,6 @@ class BibliotecaEditorial(models.Model):
         for record in self:
             record.display_name = record.editorial or ''
 
-
 class BibliotecaGenero(models.Model):
     _name = 'biblioteca.genero'
     _description = 'Género o Categoría'
@@ -146,7 +142,6 @@ class BibliotecaGenero(models.Model):
         for record in self:
             record.display_name = record.genero or ''
 
-
 class BibliotecaUbicacion(models.Model):
     _name = 'biblioteca.ubicacion'
     _description = 'Ubicación Física'
@@ -160,8 +155,7 @@ class BibliotecaUbicacion(models.Model):
     def _compute_display_name(self):
         for record in self:
             record.display_name = record.ubicacion or ''
-            
-            
+                      
 class BibliotecaUsuario(models.Model):
     _name = 'biblioteca.usuario'
     _description = 'Usuario de Biblioteca'
@@ -221,7 +215,6 @@ class BibliotecaUsuario(models.Model):
             return (False, f"Dígito verificador incorrecto.")
         return (True, "Cédula válida")
 
-
 class BibliotecaPrestamo(models.Model):
     _name = 'biblioteca.prestamo'
     _description = 'Prestamo de libro'
@@ -239,11 +232,10 @@ class BibliotecaPrestamo(models.Model):
     multabool= fields.Boolean(default=False)
     multas=fields.Float()
     fechamax=fields.Datetime(compute='_compute_fecha_devo', string='Fecha Maxima de devolución', store=True)
-    personalprestamo=fields.Many2one('res.users', string='Persona que presto el libro',
-                             default= lambda self: self.env.uid)
+    personalprestamo=fields.Many2one('biblioteca.personal', string='Personal de Prestamo', required=True)
     
     def _cron_multas(self):
-        self.env['biblioteca.prestamo'].search([('estado', '=', 'p'), 
+        prestamos = self.env['biblioteca.prestamo'].search([('estado', '=', 'p'), 
                                                 ('fechamax', '<', datetime.now())])
 
         for prestamo in prestamos:
@@ -277,8 +269,7 @@ class BibliotecaPrestamo(models.Model):
 #    def _compute_display_name(self):
 #        for record in self:
 #            record.display_name = f"{record.libro_id.name or ''} - {record.usuario_id.nombre or ''}"
-            
-            
+                        
 class BibliotecaPersonal(models.Model):
     _name = 'biblioteca.personal'
     _description = 'Personal de la Biblioteca'
