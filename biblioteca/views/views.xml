@@ -217,7 +217,7 @@
           <field name="fechadevolucion"/>
           <field name="estado"/>
           <field name="multabool"/>
-          <field name="multas"/>
+          <field name="multa"/>
           <field name="fechamax"/>
           <field name="personalprestamo"/>
         </list>
@@ -244,7 +244,7 @@
             <field name="fechadevolucion" readonly="estado in ('p','d','m')" required="estado in ('p','m')"/>
             <field name="estado" readonly="estado in ('p','d','m')"/>
             <field name="multabool" readonly="estado in ('p','d','m')"/>
-            <field name="multas" readonly="estado in ('p','d','m')" invisible="multabool ==False"/>
+            <field name="multa" readonly="estado in ('p','d','m')" invisible="multabool ==False"/>
             <field name="fechamax" readonly="estado in ('p','d','m')"/>
             <field name="personalprestamo" readonly="estado in ('p','d','m')"/>
             </group>

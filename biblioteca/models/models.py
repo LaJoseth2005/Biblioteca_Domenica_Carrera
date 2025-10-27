@@ -8,9 +8,9 @@ class BibliotecaLibro(models.Model):
     _description = 'Libro de la Biblioteca'
     _rec_name = 'name'
 
-    name = fields.Char(string='Título del Libro', required=True)
+    name = fields.Char(string='Título del Libro', required=False)
     author_id = fields.Many2one('biblioteca.autor', string='Autor')
-    isbn = fields.Char(string='ISBN', required=True)
+    isbn = fields.Char(string='ISBN', required=False)
     editorial_id = fields.Many2one('biblioteca.editorial', string='Editorial')
     fechapubli = fields.Integer(string='Año de publicación')
     genero_id = fields.Many2one('biblioteca.genero', string='Género o Categoría')
@@ -223,30 +223,42 @@ class BibliotecaPrestamo(models.Model):
     name=fields.Char(required=True)
     usuario_id = fields.Many2one('biblioteca.usuario', string='Usuario', required=True)
     libro_id = fields.Many2one('biblioteca.libro', string='Libro', required=True)
-    fechaprestamo = fields.Date(string='Fecha de préstamo', required=True)
+    fechaprestamo = fields.Datetime(default=datetime.now(), string='Fecha de prestamo')
     fechadevolucion = fields.Date(string='Fecha de devolución')
     estado = fields.Selection(selection=[('b', 'Borrador'),
                                         ('p', 'Prestamo'),
                                         ('m', 'Multa'),
                                         ('d', 'Devuelto'),],string='Estado', default='b')
-    multabool= fields.Boolean(default=False)
-    multas=fields.Float()
-    fechamax=fields.Datetime(compute='_compute_fecha_devo', string='Fecha Maxima de devolución', store=True)
-    personalprestamo=fields.Many2one('biblioteca.personal', string='Personal de Prestamo', required=True)
+    multabool = fields.Boolean(default=False)
+    multa = fields.Float()
+    fechamax = fields.Datetime(compute='_compute_fecha_devo', string='Fecha Maxima de devolución', store=True)
+    personalprestamo = fields.Many2one('biblioteca.personal', string='Personal de Prestamo')
     
-    def _cron_multas(self):
+    def _cron_multa(self):
         prestamos = self.env['biblioteca.prestamo'].search([('estado', '=', 'p'), 
                                                 ('fechamax', '<', datetime.now())])
 
         for prestamo in prestamos:
             prestamo.write=({'estado':'m',
                              'multabool':True,
-                             'multas':1.0})
+                             'multa':1.0}) 
+                       
+            seq = self.ref['sequence_codigo_multa'].next_by_code('biblioteca.multa')
+            mult = self.env['biblioteca.multa'].create({'codigo': seq,
+                                                        'usuario_id': prestamo.usuario_id.id,
+                                                        'motivo': 're,da',
+                                                        'estado': 'pen',
+                                                        'monto': prestamo.multa,
+                                                        'fecha': datetime.now(),
+                                                        'prestamo': prestamo.id
+                                                        })
             
-        prestamos = self.env['bibioteca.prestamo'].search((['estado', '=', 'm']))
-        for prestamo in prestamos:
+            prestamos = self.env['bibioteca.prestamo'].search((['estado', '=', 'm']))
+            for prestamo in prestamos:
+                multa = self.env['biblioteca.multa'].search([('prestamo', '=', prestamo.id)])
                 days= (datetime.now() - prestamo.fechamax).days
-                prestamo.write=({'multas': days})
+                multa.write({'monto: days'})
+                prestamo.write=({'multa': days})
           
     def write(self, vals):
         seq = self.env.ref('biblioteca.sequence_codigo_prestamo').next_by_code('biblioteca.prestamo')
@@ -298,20 +310,22 @@ class BibliotecaMulta(models.Model):
     usuario_id = fields.Many2one(comodel_name='biblioteca.usuario', string='Usuario', required=True)
     monto = fields.Float(string='Monto', required=True)
     motivo = fields.Selection(
-        [('retraso', 'Retraso'), ('dano', 'Daño'), ('perdida', 'Pérdida')],
-        string='Motivo',
-        required=True
+        [('re', 'Retraso'), 
+         ('da', 'Daño'), 
+         ('pe', 'Pérdida')],
+        string='Motivo', required=True
     )
-    fecha = fields.Date(string='Fecha', required=True, default=fields.Date.context_today)
+    fecha = fields.Date(string='Fecha', required=True)
     estado = fields.Selection(
-        [('pendiente', 'Pendiente'), ('pagado', 'Pagado')],
-        string='Estado',
-        required=True,
-        default='pendiente'
+        [('pen', 'Pendiente'), 
+         ('pa', 'Pagado')],
+        string='Estado',required=True, default='Pendiente'
     )
-    display_name = fields.Char(compute='_compute_display_name', store=True)
-
-    @api.depends('usuario_id')
-    def _compute_display_name(self):
+    prestamo = fields.Many2one('biblioteca.prestamo')
+    
+    @api.constrains('motivo')
+    def _check_motivo_conflicto(self):
         for record in self:
-            record.display_name = record.usuario_id.nombre if record.usuario_id else 'Multa sin usuario'
+            motivos = [m.strip() for m in record.motivo.split(',')]
+            if 'da' in motivos and 'pe' in motivos:
+                raise ValidationError("No puedes seleccionar 'Daño' y 'Pérdida' al mismo tiempo.")
