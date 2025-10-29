@@ -319,12 +319,12 @@ class BibliotecaMulta(models.Model):
     estado = fields.Selection(
         [('pen', 'Pendiente'), 
          ('pa', 'Pagado')],
-        string='Estado',required=True, default='Pendiente'
+        string='Estado',required=True, default='pen'
     )
     prestamo = fields.Many2one('biblioteca.prestamo')
     
     @api.constrains('motivo')
-    def _check_motivo_conflicto(self):
+    def _motivo(self):
         for record in self:
             motivos = [m.strip() for m in record.motivo.split(',')]
             if 'da' in motivos and 'pe' in motivos:
