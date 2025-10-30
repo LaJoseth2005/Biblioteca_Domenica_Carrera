@@ -230,28 +230,41 @@
       <field name="arch" type="xml">
         <form>
           <header>
-            <button string="Prestar" type="object" name="generar_prestamo" invisible="estado in ('p','d','m')"/>
-            <field name="estado" widget='statusbar'/>
+            <button string="Prestar" type="object" name="generar_prestamo"
+                    invisible="estado in ['p','d','m']"
+                    class="btn-primary"/>
+
+            <button string="Aplicar multa" type="object" name="action_aplicar_multa"
+                    invisible="estado != 'p'"
+                    class="btn-danger"
+                    confirm="¿Deseas aplicar una multa a este préstamo?"/>
+
+            <field name="estado" widget="statusbar" statusbar_visible="b,p,m,d"/>
           </header>
                   
+          <sheet>
             <group>
-            <label for="name" string="Codigo de prestamo"/>
-            <field name="name" readonly="estado in ('p','d','m')" nolabel="1"/>
+              <label for="name" string="Código de préstamo"/>
+              <field name="name" nolabel="1" readonly="estado in ['p','d','m']"/>
 
-            <field name="usuario_id" readonly="estado in ('p','d','m')"/>
-            <field name="libro_id" readonly="estado in ('p','d','m')"/>
-            <field name="fechaprestamo" readonly="estado in ('p','d','m')"/>
-            <field name="fechadevolucion" readonly="estado in ('p','d','m')" required="estado in ('p','m')"/>
-            <field name="estado" readonly="estado in ('p','d','m')"/>
-            <field name="multabool" readonly="estado in ('p','d','m')"/>
-            <field name="multa" readonly="estado in ('p','d','m')" invisible="multabool ==False"/>
-            <field name="fechamax" readonly="estado in ('p','d','m')"/>
-            <field name="personalprestamo" readonly="estado in ('p','d','m')"/>
+              <field name="usuario_id" readonly="estado in ['p','d','m']"/>
+              <field name="libro_id" readonly="estado in ['p','d','m']"/>
+              <field name="fechaprestamo" readonly="estado in ['p','d','m']"/>
+              <field name="fechadevolucion" readonly="estado in ['p','d','m']" required="estado == 'd'"/>
+              <field name="estado" readonly="estado in ['p','d','m']"/>
+              <field name="multabool" readonly="estado in ['p','d','m']"/>
+
+              <field name="motivo_multa" invisible="estado not in ['p','m']"/>
+
+              <field name="multa" invisible="multabool == False"/>
+              
+              <field name="fechamax" readonly="estado in ['p','d','m']"/>
+              <field name="personalprestamo" readonly="estado in ['p','d','m']"/>
             </group>
+          </sheet>
         </form>
       </field>
-    </record>   
-
+    </record>
 
     <record model="ir.ui.view" id="biblioteca_personal_list">
       <field name="name">biblioteca personal list</field>
