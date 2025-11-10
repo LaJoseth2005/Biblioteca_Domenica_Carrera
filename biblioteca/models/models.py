@@ -215,20 +215,16 @@ class BibliotecaUsuario(models.Model):
             return (False, f"Dígito verificador incorrecto.")
         return (True, "Cédula válida")
 
-class BibliotecaPrestamo(models.Model):
-    _name = 'biblioteca.prestamo'
-    _description = 'Prestamo de libro'
-    _rec_name = 'display_name'
 
 class BibliotecaPrestamo(models.Model):
     _name = 'biblioteca.prestamo'
     _description = 'Prestamo de libro'
     _rec_name = 'name'
 
-    name = fields.Char(required=True, string="Código")
+    name = fields.Char(string="Código Prestamo")
     usuario_id = fields.Many2one('biblioteca.usuario', string='Usuario', required=True)
-    libro_id = fields.Many2one('biblioteca.libro', string='Libro', required=True)
-    fechaprestamo = fields.Datetime(default=lambda self: datetime.now(), string='Fecha de préstamo')
+    libro_id = fields.Many2many('biblioteca.libro', string='Libro', required=True)
+    fechaprestamo = fields.Datetime(default=datetime.now(), string='Fecha de préstamo')
     fechadevolucion = fields.Date(string='Fecha de devolución')
     estado = fields.Selection([
         ('b', 'Borrador'),
@@ -239,6 +235,7 @@ class BibliotecaPrestamo(models.Model):
 
     multabool = fields.Boolean(default=False)
     multa = fields.Float(string='Monto de multa')
+    multa_id = fields.One2many('biblioteca.multa', 'prestamo', string='Multa')
     motivo_multa = fields.Selection([
         ('re', 'Retraso'),
         ('da', 'Daño'),
@@ -291,6 +288,11 @@ class BibliotecaPrestamo(models.Model):
             seq = self.env.ref('biblioteca.sequence_codigo_prestamo').next_by_code('biblioteca.prestamo')
             vals['name'] = seq
         return super(BibliotecaPrestamo, self).write(vals)
+    
+    def create(self, vals):
+        if not vals.get('libro_id'):
+            raise ValidationError("Seleccione un libro antes de prestar")
+        return super(BibliotecaPrestamo, self).create(vals)
 
     def generar_prestamo(self):
         print("generando Prestamo")

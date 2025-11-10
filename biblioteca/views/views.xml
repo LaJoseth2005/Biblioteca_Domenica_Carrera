@@ -243,24 +243,22 @@
           </header>
                   
           <sheet>
-            <group>
-              <label for="name" string="Código de préstamo"/>
-              <field name="name" nolabel="1" readonly="estado in ['p','d','m']"/>
-
-              <field name="usuario_id" readonly="estado in ['p','d','m']"/>
-              <field name="libro_id" readonly="estado in ['p','d','m']"/>
-              <field name="fechaprestamo" readonly="estado in ['p','d','m']"/>
-              <field name="fechadevolucion" readonly="estado in ['p','d','m']" required="estado == 'd'"/>
-              <field name="estado" readonly="estado in ['p','d','m']"/>
-              <field name="multabool" readonly="estado in ['p','d','m']"/>
-
-              <field name="motivo_multa" invisible="estado not in ['p','m']"/>
-
-              <field name="multa" invisible="multabool == False"/>
-              
-              <field name="fechamax" readonly="estado in ['p','d','m']"/>
-              <field name="personalprestamo" readonly="estado in ['p','d','m']"/>
+            <group col="6">
+              <group colspan="2">
+                <field name="name" readonly="1"/>
+                <field name="fechaprestamo" readonly="1"/>
+                <field name="fechadevolucion" readonly="1"/>
+                <field name="fechamax" readonly="1"/>
+              </group>
+              <group colspan="4">
+                <field name="usuario_id" readonly="estado in ['p','d','m']"/>
+                <field name="multabool" readonly="1"/>
+                <field name="motivo_multa" invisible="estado not in ['p','m']"/>
+                <field name="multa" readonly="1" invisible="multabool == False"/>
+                <field name="personalprestamo" readonly="estado in ['p','d','m']"/> 
+              </group>
             </group>
+            <field name="libro_id" required="1" readonly="estado in ['p','d','m']" nolabel="1"/>
           </sheet>
         </form>
       </field>
