@@ -26,6 +26,7 @@ Long description of module's purpose
         'data/sequence.xml',
         'data/cron.xml',
         'views/views.xml',
+        'views/wizard_views.xml'
         #'views/templates.xml',
     ],
     # only loaded in demonstration mode

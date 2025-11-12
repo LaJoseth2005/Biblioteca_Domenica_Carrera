@@ -215,7 +215,24 @@ class BibliotecaUsuario(models.Model):
             return (False, f"Dígito verificador incorrecto.")
         return (True, "Cédula válida")
 
-
+class BibliotecaWizard(models.TransientModel):
+    _name = "biblioteca.wizard"
+    _description = "Wizard para devolucion de prestamo"
+    
+    prestamo_id= fields.Many2one('biblioteca.prestamo')
+    motivo_multa = fields.Selection([
+        ('re', 'Retraso'),
+        ('da', 'Daño'),
+        ('pe', 'Pérdida'),
+    ], string='Motivo de multa', default='b')
+    observaciones=fields.Char(string='Observaciones')
+    
+    def cerrar_prestamo(self):
+        self.prestamo_id.motivo_multa = self.motivo_multa
+        self.prestamo_id.observaciones = self.observaciones
+        self.prestamo_id.estado = 'd'
+        print("caca")
+        
 class BibliotecaPrestamo(models.Model):
     _name = 'biblioteca.prestamo'
     _description = 'Prestamo de libro'
@@ -232,7 +249,7 @@ class BibliotecaPrestamo(models.Model):
         ('m', 'Multa'),
         ('d', 'Devuelto'),
     ], string='Estado', default='b')
-
+    observaciones=fields.Char(string='Observaciones')
     multabool = fields.Boolean(default=False)
     multa = fields.Float(string='Monto de multa')
     multa_id = fields.One2many('biblioteca.multa', 'prestamo', string='Multa')
@@ -297,6 +314,17 @@ class BibliotecaPrestamo(models.Model):
     def generar_prestamo(self):
         print("generando Prestamo")
         self.write({'estado': 'p'})
+        
+    def devolver(self):
+        suma = 1 + 2
+        return{
+            'type': 'ir.actions.act_window',
+            'res_model': 'biblioteca.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'view_id': self.env.ref('biblioteca.biblioteca_wizard_form').id,
+            'context': {'default_prestamo_id': self.id, 'default_observaciones': suma}
+        }
             
     @api.depends('fechaprestamo')
     def _compute_fecha_devo(self):

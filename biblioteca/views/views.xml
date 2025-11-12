@@ -230,16 +230,12 @@
       <field name="arch" type="xml">
         <form>
           <header>
-            <button string="Prestar" type="object" name="generar_prestamo"
-                    invisible="estado in ['p','d','m']"
-                    class="btn-primary"/>
-
-            <button string="Aplicar multa" type="object" name="action_aplicar_multa"
-                    invisible="estado != 'p'"
-                    class="btn-danger"
-                    confirm="¿Deseas aplicar una multa a este préstamo?"/>
-
-            <field name="estado" widget="statusbar" statusbar_visible="b,p,m,d"/>
+            <button string="Prestar" type="object" name="generar_prestamo" invisible="estado in ['p','d','m']" class="btn-primary"/>
+            <button name="action_devolucion_normal" string="Devolver" type="object" class="btn-secondary" invisible="estado in ['b','d']"/>
+            <button name="%(biblioteca_wizard_action_window)d" string="Devolver" type="action" class="oe_highlight" invisible="estado in ['b','d']"/>
+            <button name="Aplicar multa" type="object" name="action_aplicar_multa" invisible="estado != 'p'" class="btn-danger" confirm="¿Deseas aplicar una multa a este préstamo?"/>
+            <field name="estado" widget="statusbar"/>
+            <field name="motivo_multa" widget="radio" options="{'horizontal': True}" readonly="estado in ('b', 'd')"/>
           </header>
                   
           <sheet>
@@ -252,6 +248,7 @@
               </group>
               <group colspan="4">
                 <field name="usuario_id" readonly="estado in ['p','d','m']"/>
+                <field name="observaciones" readonly="1"/>
                 <field name="multabool" readonly="1"/>
                 <field name="motivo_multa" invisible="estado not in ['p','m']"/>
                 <field name="multa" readonly="1" invisible="multabool == False"/>
