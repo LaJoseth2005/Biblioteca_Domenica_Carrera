@@ -25,8 +25,17 @@ Long description of module's purpose
         'security/ir.model.access.csv',
         'data/sequence.xml',
         'data/cron.xml',
+        'views/wizard_views.xml',
+        'views/Libro_views.xml',
+        'views/Autor_views.xml',
+        'views/Editorial_views.xml',
+        'views/Genero_views.xml',
+        'views/Ubicacion_views.xml',
+        'views/Usuario_views.xml',
+        'views/Prestamo_views.xml',
+        'views/Personal_views.xml',
+        'views/Multa_views.xml',
         'views/views.xml',
-        'views/wizard_views.xml'
         #'views/templates.xml',
     ],
     # only loaded in demonstration mode

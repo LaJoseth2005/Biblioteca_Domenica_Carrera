@@ -1,19 +1,19 @@
 <odoo>
     <data>
 
-        <record model="ir.ui.views" id="biblioteca_wizard_form">
+        <record model="ir.ui.view" id="biblioteca_wizard_form">
             <field name="name">biblioteca_wizard_form</field>
             <field name="model">biblioteca.wizard</field>
             <field name="arch" type="xml">
                 <form>
                     <label for="motivo_multa" string="Estado de libro"/>
-                    <field for="motivo_multa" widget="radio"/>
+                    <field name="motivo_multa" widget="radio"/>
                     <label for="observaciones" string="Comentario"/>
-                    <field for="observaciones"/>
+                    <field name="observaciones"/>
                     <footer>
                         <button string='Aceptar' type='object' name='cerrar_prestamo' class='btn-primary'/>
                         <button string='Cancel' special='cancel'/>
-                    <footer>
+                    </footer>
                 </form>
             </field>
         </record>
@@ -23,7 +23,7 @@
             <field name="res_model">biblioteca.wizard</field>
             <field name="view_mode">form</field>
             <field name="target">new</field>
-            <field name="context">('default_prestamo_id': contexto.get('active_id'))</field>
+            <field name="context">{'default_prestamo_id': 'active_id'}</field>
             </record>
     </data>
 </odoo>
